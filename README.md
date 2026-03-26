@@ -14,11 +14,9 @@ SecurityTalent C2 is a modern, cross-platform Command & Control (C2) framework d
 - Live server logging and status monitoring
 
 
+> **⚠️ Warning:** Command and Control (C2) is still in an experimental stage, more advanced and powerful versions will be released in the future.
 
 
-```diff
-+ Command and Control (C2) is still in an experimental stage, more advanced and powerful versions will be released in the future.
-```
 # 🛠️ Architecture
 
 ```bash
