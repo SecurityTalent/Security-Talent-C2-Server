@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Talent C2 Server</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <!-- favicon -->
+   <link rel="icon" type="image/x-icon" href="image/SecurityTalent.png">
+</head>
+<body>
+<div class="header">
+    <img class="header-Image" src="image/SecurityTalent.png" alt="">
+  <h1><span style="color: #FD8B57;">Security Talent</span> C2 Server</h1>
+  <div id="status" class="status red">Listener: OFFLINE</div>
+</div>
+
+<div class="panel">
+  <h3>🎯 Listener Control</h3>
+  <div class="listener-controls">
+    <input type="number" id="newPort" value="4444" min="1024" max="65535">
+    <button id="startBtn" class="success">▶️ START LISTENER</button>
+    <button id="stopBtn" class="danger" disabled>⏹️ STOP</button>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>⚙️ Generate Implant</h3>
+  <div class="grid">
+    <div>
+      <label>Target OS:</label>
+      <select id="targetOS">
+        <option value="nodejs">🐙 Node.js</option>
+        <option value="powershell">⚡ PowerShell</option>
+        <option value="bash">🐧 Bash/Linux</option>
+      </select>
+
+    <!-- * Implant → C2 Server sends "I'm alive" signal every X milliseconds.Default: 5000ms = 5 seconds -->
+      <label>Beacon Interval:</label>
+      
+      <input type="number" id="beaconInterval" value="5000" min="1000" max="30000">
+      <label>Listener Port:</label>
+      <input type="number" id="listenerPort" value="4444" min="1024" max="65535">
+      <button id="generateBtn" class="success">🎲 GENERATE IMPLANT</button>
+    </div>
+    <div>
+      <label>Implant Code:</label>
+      <textarea id="implantCode" readonly placeholder="Generated implant will appear here..."></textarea>
+      <button id="downloadBtn" class="success" disabled>💾 DOWNLOAD</button>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>📊 Active Sessions (<span id="sessionCount">0</span>)</h3>
+  <div id="sessions" class="session-grid"></div>
+</div>
+
+<div class="panel">
+  <h3>💻 Command Terminal - <span id="currentSessionName">No Session</span></h3>
+  <div id="terminal" class="terminal">$ SecurityTalent C2 v2.1- TestProject Ready! Select session to execute commands...</div>
+  <div class="cmd-inputs">
+    <input id="cmdInput" placeholder="whoami && id && pwd" disabled>
+    <button id="execBtn" class="success" disabled>▶️ EXECUTE</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
