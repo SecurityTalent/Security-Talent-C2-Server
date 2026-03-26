@@ -29,6 +29,10 @@ C2 Server (Node.js + Socket.IO)
 - A private, isolated, and authorized test environment
 
 ## Installation
+```bash
+git clone https://github.com/SecurityTalent/Security-Talent-C2-Server.git
+cd Security-Talent-C2-Server
+```
 
 ```bash
 npm install
