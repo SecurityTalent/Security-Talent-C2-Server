@@ -1,4 +1,4 @@
-# Security Talent C2 Server
+# Security Talent Command and Control (C2) Server
 
 SecurityTalent C2 is a modern, cross-platform Command & Control (C2) framework designed for authorized penetration testing and red team operations. Built with Socket.IO for real-time communication, it supports multiple implant types (Node.js, PowerShell, Bash/Linux) with beaconing capabilities.
 
@@ -70,8 +70,7 @@ START LISTENER → GENERATE IMPLANT → DEPLOY ON TARGET
 
 
 ## Disclaimer
-Authorized Use Only - Platform Terms of Service apply. For penetration testing, red teaming, and authorized security assessments.
-
+Use this code for Educational Purpose only.
 
 # 🆘 Support
 - GitHub Issues
