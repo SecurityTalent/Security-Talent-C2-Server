@@ -234,6 +234,7 @@ label {
 
 .box1{
   position: relative;
+  width: 70% !important;
 }
 .cmd-inputs {
     padding: 15px;
