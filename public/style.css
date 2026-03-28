@@ -189,7 +189,7 @@ label {
 .panel.panelRoot {
     background: #0a0a0a;
     padding: 20px;
-    width: 1500px;
+    width: auto;
     margin: 0 auto;
     display: flex;
 }
