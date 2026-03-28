@@ -133,4 +133,8 @@ document.addEventListener("click", e=>{
   }
 });
 
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+
+
 log("🚀 SecurityTalent C2 v2.1- LOADED & READY!");
